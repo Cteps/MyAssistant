@@ -1,0 +1,21 @@
+﻿@using MAlib.Entity.Models._Obj
+<h3>Objetivos</h3>
+
+<div class="container-fluid">
+    <div class="row">
+        <select class="form-select" multiple aria-label="Multiple select example">
+            <option selected>Open this select menu</option>
+            @foreach (var o in list)
+            {
+                <option value="@o.ObjGeralId">@o.Name</option>
+            }
+        </select>
+    </div>
+</div>
+@code {
+    List<ObjEsp> list = new List<ObjEsp>
+            {
+                new ObjEsp { Name="A", ObjGeralId=1 },
+                new ObjEsp { Name="B", ObjGeralId=2 }
+            };
+}

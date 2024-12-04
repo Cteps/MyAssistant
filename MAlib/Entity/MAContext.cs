@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MAlib.Entity.Models._Obj;
+using Microsoft.EntityFrameworkCore;
 
 namespace MAServer.Entity
 {

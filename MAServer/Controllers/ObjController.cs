@@ -1,28 +1,57 @@
-﻿using MAServer.Entity;
+﻿using MAlib.Entity.Models._Obj;
+using MAlib.Repository._Obj;
+using MAServer.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace MAServer.Controllers
 {
     [ApiController]
-    [Route("api/Obj/[controller]")]
+    [Route("api/Obj")]
     public class ObjController : ControllerBase
     {
-        private readonly MAContext _context;
+        private readonly ObjRepo _repo;
 
-        [HttpGet]
+        public ObjController(ObjRepo repo)
+        {
+            _repo = repo;
+        }
+        [HttpGet("Geral")]
         public async Task<IActionResult> GetGeralObj()
         {
-            var products = await _context.ObjEsp.ToListAsync();
-            return Ok(products);
-        }
+            try
+            {
+                var obj = await _repo.GetObjGeral();
 
-        [HttpPost]
-        public async Task<IActionResult> CreateProduct(ObjEsp objEsp)
+                if (obj == null || !obj.Any())
+                {
+                    return NoContent();
+                }
+                return Ok(obj);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro interno: {ex.Message}");
+            }
+        }
+        [HttpGet("Specific")]
+        public async Task<IActionResult> GetObjEsp()
         {
-            _context.ObjEsp.Add(objEsp);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetGeralObj), new { id = objEsp.Id }, objEsp);
+            try
+            {
+                var obj = await _repo.GetObjEsp();
+                if (obj == null || !obj.Any())
+                {
+                    return NoContent();
+                }
+                return Ok(obj);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Erro interno: {ex.Message}");
+            }
         }
     }
 }
