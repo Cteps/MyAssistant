@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAlib", "MAlib\MAlib.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAServer", "MAServer\MAServer.csproj", "{24FD2F80-9B95-4443-A94A-2B2496D172D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MAClient", "MAClient\MAClient.csproj", "{CB409946-E880-450E-9E33-2932CB1F6624}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MAClient", "MAClient\MAClient.csproj", "{CB409946-E880-450E-9E33-2932CB1F6624}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

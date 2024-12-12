@@ -1,0 +1,214 @@
+﻿@using MAlib.ComplexModels
+@using MAlib.Entity.Models._Planner;
+@using MAlib.Entity.Models._Obj;
+
+<PopUp @ref="PopupComponent" Title="@PopupTitle" ConfirmButtonText="Okay" CancelButtonText="Close"
+       OnConfirm="ConfirmAction">
+    <Body>
+        <p>@Popupbody</p>
+    </Body>
+</PopUp>
+<div class="row" style="margin-top:15px">
+    <div class="col-1">
+        <label for="number" class="col-form-label">Nº:</label>
+    </div>
+    <div class="col-1">
+        <input class="form-control form-control-sm" type="text" placeholder="Number" aria-label=".form-control-sm example" @bind=mesociclo.Numero>
+    </div>
+    <div class="col-1">
+        <label for="months" class="col-form-label">Mês</label>
+    </div>
+    <div class="col-2">
+        <select id="months" class="form-select" @bind=mesociclo.Month>
+            <option>----</option>
+            @foreach (var m in _months)
+            {
+                <option>@m</option>
+            }
+        </select>
+    </div>
+    <div class="col-1">
+        <label for="weeks" class="col-form-label">Weeks</label>
+    </div>
+    <div class="col-2">
+        <select id="weeks" class="form-select" @bind=mesociclo.Weeks>
+            <option>----</option>
+            @for (int i = 1; i <= 6; i++)
+            {
+                <option>@i</option>
+            }
+        </select>
+    </div>
+    <div class="col-1">
+        <label for="pej13" class="col-form-label">PEJ1-3</label>
+    </div>
+    <div class="col-3">
+        <select id="pej13" class="form-select" @bind=mesociclo.PEJ>
+            <option>----</option>
+            @foreach (var pej in _PEJ)
+            {
+                @if (pej.Level < 4)
+                {
+                    <option>@pej.Name</option>
+                }
+            }
+        </select>
+    </div>
+</div>
+<div class="row" style="margin-top:15px">
+    <div class="col-1">
+        <label for="pej4" class="col-form-label">PEJ4</label>
+    </div>
+    <div class="col-2">
+        <select id="pej4" class="form-select" @bind=mesociclo.PEJ4>
+            <option>----</option>
+            @foreach (var pej in _PEJ)
+            {
+                @if (pej.Level == 4)
+                {
+                    <option>@pej.Name</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="col-1">
+        <label for="et" class="col-form-label">Esquema Tatico</label>
+    </div>
+    <div class="col-2">
+        <select id="et" class="form-select" @bind=mesociclo.EsqTat>
+            <option>----</option>
+            @foreach (var et in _ET)
+            {
+                <option>@et</option>
+            }
+        </select>
+    </div>
+    <div class="col-1">
+        <label for="cf" class="col-form-label">Capacidades Fisicas</label>
+    </div>
+    <div class="col-2">
+        <select id="cf" class="form-select" @bind=mesociclo.CF>
+            <option>----</option>
+            @foreach (var cf in _CF)
+            {
+                <option>@cf</option>
+            }
+        </select>
+    </div>
+</div>
+<div class="row">
+    <div class="col-1">
+        <label for="tt" class="col-form-label">TT</label>
+    </div>
+    <div class="col-3">
+        <ChecklistDisplay colLength="12" CheckList="_TT" SelectedItemsChanged="TImodified"></ChecklistDisplay>
+    </div>
+    <div class="col-3">
+        @if (isUpdate)
+        {
+            <button class="btn btn-primary" @onclick=UpdateEvent>Atualizar</button>
+        }
+        else
+        {
+            <button class="btn btn-primary" @onclick=SaveEvent>Guardar</button>
+        }
+        <button class="btn btn-primary" @onclick=Clean>Clean</button>
+    </div>
+</div>
+@* <div class="row">
+    @mesociclo.Numero
+    @mesociclo.Weeks
+    @mesociclo.CF
+    @mesociclo.EsqTat
+    @mesociclo.Month
+    @mesociclo.PEJ
+    @mesociclo.PEJ4
+    @foreach (var e in mesociclo.TT)
+    {
+        @e
+
+    }k
+    }k
+</div> *@
+@code {
+    #region "PopUp"
+    private PopUp PopupComponent;
+    public string PopupTitle = "Invalido";
+    public string Popupbody = "-";
+
+    public async Task ShowPopup()
+    {
+        await PopupComponent.ShowAsync();
+    }
+
+    private void ConfirmAction()
+    {
+        Console.WriteLine("Confirm button clicked!");
+        PopupComponent.HideAsync();
+    }
+    #endregion
+    [Parameter]
+    public EventCallback<Mesociclo> MesocicloSaved { get; set; } = new EventCallback<Mesociclo>();
+    [Parameter]
+    public EventCallback<Mesociclo> MesocicloUpdate { get; set; } = new EventCallback<Mesociclo>();
+    private bool isUpdate = false;
+    private List<string> _months;
+    private List<CheckList> _TT;
+    private List<string> _ET;
+    private List<string> _CF;
+    private List<PEJ> _PEJ;
+    private Mesociclo mesociclo;
+    protected override async Task OnInitializedAsync()
+    {
+        mesociclo = new Mesociclo();
+        _PEJ = (await OffService.GetPEJ());
+        _months = (await OffService.GetMonths());
+        _TT = (await OffService.GetTT());
+        _ET = (await OffService.GetET());
+        _CF = (await OffService.GetCF());
+    }
+    public void TImodified(List<CheckList> lists)
+    {
+        mesociclo.TT = lists.Select(s => s.Description).ToList();
+    }
+
+    public async void SaveEvent()
+    {
+        if (IsValidateMeso(mesociclo))
+        {
+            await MesocicloSaved.InvokeAsync(mesociclo);
+            Clean();
+        }
+    }
+    public async void UpdateEvent()
+    {
+        if (IsValidateMeso(mesociclo))
+        {
+            await MesocicloUpdate.InvokeAsync(mesociclo);
+            isUpdate = false;
+            Clean();
+        }
+    }
+
+    public void Clean()
+    {
+        mesociclo = new Mesociclo();
+    }
+    public void Load(Mesociclo meso)
+    {
+        mesociclo = meso;
+        isUpdate = true;
+    }
+
+    public bool IsValidateMeso(Mesociclo meso)
+    {
+        if (meso.Weeks == null || meso.EsqTat == null || meso.TT.Count == 0 || meso.CF == null || meso.PEJ == null || meso.PEJ4 == null)
+        {
+            Popupbody = "Todos os campos têm de ser preenchidos!";
+            ShowPopup();
+            return false;
+        }
+
+        return true;
+    }
+}

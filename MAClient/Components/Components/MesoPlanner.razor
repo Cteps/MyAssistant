@@ -1,0 +1,154 @@
+﻿@using MAlib.Entity.Models._Planner
+@using MAClient.Components.Components
+
+
+
+<div class=" container-fluid">
+    <div class="row">
+        <MesoCard @ref="mesoCard" MesocicloSaved="UpdateMacro" MesocicloUpdate="UpdateMeso"></MesoCard>
+    </div>
+
+    <div class="row">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>
+                        <button class="btn btn-close" @onclick=Reset></button>
+                    </th>
+                    @foreach (var meso in macro.mesos)
+                    {
+                        <td @onclick="()=>ChangeMeso(meso.Numero)">
+                            Meso @meso.Numero
+                            <button class="btn btn-close" @onclick="()=>DeleteColumn(meso.Numero)"></button>
+                        </td>
+
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Mês</td>
+                    @foreach (var meso in macro.mesos)
+                    {
+                        <td>@meso.Month</td>
+                    }
+                </tr>
+                <tr>
+                    <td>Semanas</td>
+                    @foreach (var meso in macro.mesos)
+                    {
+                        <td>@meso.Weeks</td>
+                    }
+                </tr>
+                <tr>
+                    <td>Tecnica Individual</td>
+                    @foreach (var meso in macro.mesos)
+                    {
+                        <td>
+                            @foreach (var tt in meso.TT)
+                            {
+                                <div>@tt</div>
+                            }
+                        </td>
+                    }
+                </tr>
+                <tr>
+                    <td>Principio de Jogo</td>
+                    @foreach (var meso in macro.mesos)
+                    {
+                        <td>@meso.PEJ</td>
+                    }
+                </tr>
+                <tr>
+                    <td>Principio de Jogo</td>
+                    @foreach (var meso in macro.mesos)
+                    {
+                        <td>@meso.PEJ4 e @meso.EsqTat</td>
+                    }
+                </tr>
+                <tr>
+                    <td>Capacidades Fisicas</td>
+                    @foreach (var meso in macro.mesos)
+                    {
+                        <td>@meso.CF</td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+@code {
+    public Macrociclo macro { get; set; }
+    private MesoCard mesoCard;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        macro = new Macrociclo();
+    }
+    public void UpdateMacro(Mesociclo meso)
+    {
+        if (IsValidateMeso(meso))
+        {
+            macro.mesos.Add(meso);
+        }
+        else
+        {
+            mesoCard.Load(meso);
+        }
+
+    }
+    public void Reset()
+    {
+        macro = new Macrociclo();
+    }
+    public void ChangeMeso(int number)
+    {
+        var meso = macro.mesos.FirstOrDefault(m => m.Numero == number);
+        if (meso != null)
+        {
+            mesoCard.Load(meso);
+        }
+    }
+    public void DeleteColumn(int number)
+    {
+        var meso = macro.mesos.FirstOrDefault(m => m.Numero == number);
+        if (meso != null)
+        {
+            macro.mesos.Remove(meso);
+        }
+    }
+    public void UpdateMeso(Mesociclo meso)
+    {
+        foreach (var m in macro.mesos)
+        {
+            if (m.Numero == meso.Numero)
+            {
+                m.Weeks = meso.Weeks;
+                m.CF = meso.CF;
+                m.Month = meso.Month;
+                m.fase = meso.fase;
+                m.EsqTat = meso.EsqTat;
+                m.PEJ = meso.PEJ;
+                m.PEJ4 = meso.PEJ4;
+                m.TT = meso.TT;
+            }
+        }
+    }
+    public bool IsValidateMeso(Mesociclo meso)
+    {
+        if (macro.mesos.Count(m => m.Numero == meso.Numero) > 0)
+        {
+            mesoCard.Popupbody = "Numero já existe!";
+            mesoCard.ShowPopup();
+            return false;
+        }
+        return true;
+    }
+
+
+}
+

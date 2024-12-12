@@ -1,0 +1,92 @@
+﻿@using MAlib.ComplexModels
+<div class="col-md-@colLength" style="margin-top:5px;height:150px;overflow:auto">
+    @if (_checkList.Count > 0)
+    {
+        <button class="btn-close" aria-label="Close" @onclick="MouseClickEvent"></button>
+        <br />
+    }
+    <ul class="list-group" id="checklist">
+        @foreach (var o in _checkList)
+        {
+            <li class="list-group-item">
+                <input class="form-check-input me-1"
+                       type="checkbox"
+                       value="@o.Value"
+                       checked="@IsItemSelected(o)"
+                       @onchange="() => ToggleSelection(o)" />
+                @o.Description
+            </li>
+        }
+    </ul>
+</div>
+
+<div class="col-2">
+
+    @if (WithDisplay)
+    {
+        <label>
+            @Title: <br />
+            @foreach (var item in SelectedItems)
+            {
+                @item.Description
+                <br />
+            }
+        </label>
+    }
+
+</div>
+
+
+@code {
+    [Parameter]
+    public int colLength { get; set; } = 2;
+    [Parameter]
+    public bool WithDisplay { get; set; } = false;
+    [Parameter]
+    public string Title { get; set; } = "None";
+    [Parameter]
+    public List<CheckList> CheckList
+    {
+        get => _checkList;
+        set
+        {
+            _checkList = value ?? new List<CheckList>();
+            OnCheckListChanged();
+        }
+    }
+    [Parameter]
+    public EventCallback<List<CheckList>> SelectedItemsChanged { get; set; } = new EventCallback<List<CheckList>>();
+
+    public List<CheckList> SelectedItems { get; set; } = new();
+    private List<CheckList> _checkList = new();
+
+    private bool IsItemSelected(CheckList item) => SelectedItems.Contains(item);
+
+    private void OnCheckListChanged()
+    {
+        if (_checkList.Count == 0)
+        {
+            SelectedItems.Clear();
+        }
+    }
+    private async Task ToggleSelection(CheckList item)
+    {
+
+        if (SelectedItems.Contains(item))
+        {
+            SelectedItems.Remove(item);
+        }
+        else
+        {
+            SelectedItems.Add(item);
+        }
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+
+    }
+    private async void MouseClickEvent()
+    {
+        SelectedItems.Clear();
+        await SelectedItemsChanged.InvokeAsync(SelectedItems);
+    }
+}
+

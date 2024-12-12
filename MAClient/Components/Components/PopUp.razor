@@ -1,0 +1,58 @@
+﻿@inject IJSRuntime JSRuntime
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">@Title</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Body
+            </div>
+            <div class="modal-footer">
+                @if (ShowCancelButton)
+                {
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@CancelButtonText</button>
+                }
+                <button type="button" class="btn btn-primary" @onclick="OnConfirm">@ConfirmButtonText</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    window.bootstrapShowModal = (id) => {
+        var myModal = new bootstrap.Modal(document.getElementById(id));
+        myModal.show();
+    };
+
+    window.bootstrapHideModal = (id) => {
+        var myModal = bootstrap.Modal.getInstance(document.getElementById(id));
+        if (myModal) {
+            myModal.hide();
+        }
+    };
+</script>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Popup Title";
+    [Parameter] public RenderFragment Body { get; set; }
+    [Parameter] public string ConfirmButtonText { get; set; } = "Confirm";
+    [Parameter] public string CancelButtonText { get; set; } = "Cancel";
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public bool ShowCancelButton { get; set; } = true;
+
+    private ElementReference modalElement;
+
+    public async Task ShowAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("bootstrapShowModal", "exampleModal");
+    }
+
+    public async Task HideAsync()
+    {
+        await JSRuntime.InvokeVoidAsync("bootstrapHideModal", "exampleModal");
+    }
+}
+

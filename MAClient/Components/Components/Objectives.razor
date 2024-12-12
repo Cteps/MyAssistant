@@ -1,0 +1,24 @@
+﻿@using MAlib.ComplexModels
+
+<ChecklistDisplay CheckList="GeralObj" Title="Geral" SelectedItemsChanged="HandleSelectedItemsChanged"></ChecklistDisplay>
+<ChecklistDisplay CheckList="EspObj" Title="Especificos"></ChecklistDisplay>
+
+@code {
+    List<CheckList> GeralObj = OffService.GetGeralObj().Result;
+    List<CheckList> EspObj = new List<CheckList>();
+
+    private async Task HandleSelectedItemsChanged(List<CheckList> selectedItems)
+    {
+
+        var filteredEspObj = await OffService.GetEspObj();
+
+        filteredEspObj = filteredEspObj.Where(o => selectedItems.Any(item => item.Value == o.GeralType.ToString()))
+            .ToList();
+
+        List<CheckList> espObjAsCheckList = filteredEspObj.Cast<CheckList>().ToList();
+
+        EspObj = espObjAsCheckList;
+
+    }
+
+}

@@ -1,0 +1,28 @@
+﻿@using MAlib.ComplexModels
+@using MAlib.Entity.Models._Obj
+@using MAClient.Components.Components
+@using static MAlib.ComplexModels.CheckList
+@page "/Macrociclo"
+@rendermode InteractiveServer
+
+<PageTitle>Macrociclo</PageTitle>
+
+<h3>Macrociclo</h3>
+
+<div class="container-fluid">
+    @*     <div class="row">
+    <ChecklistDisplay CheckList="Materials" Title="Material"></ChecklistDisplay>
+    <Objectives></Objectives>
+    </div> *@
+    @* <div class="row">
+    <MesoCard></MesoCard>
+    </div> *@
+
+    <MesoPlanner></MesoPlanner>
+</div>
+
+@code {
+    List<CheckList> Materials = OffService.GetMaterials().Result;
+}
+
+
